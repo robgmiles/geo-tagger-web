@@ -54,11 +54,12 @@ export function extractCommonMetadata(exifData: any): CommonMetadata {
       if (ifd0[piexifjs.ImageIFD.Copyright]) {
         metadata.copyright = ifd0[piexifjs.ImageIFD.Copyright];
       }
-      if (ifd0[piexifjs.ImageIFD.XPTitle]) {
-        metadata.title = ifd0[piexifjs.ImageIFD.XPTitle];
+      if (ifd0[piexifjs.ImageIFD.DocumentName]) {
+        metadata.title = ifd0[piexifjs.ImageIFD.DocumentName];
       }
-      if (ifd0[piexifjs.ImageIFD.XPKeywords]) {
-        metadata.keywords = ifd0[piexifjs.ImageIFD.XPKeywords];
+      // Extract keywords from Software field if it contains our prefix
+      if (ifd0[piexifjs.ImageIFD.Software] && ifd0[piexifjs.ImageIFD.Software].startsWith('Keywords: ')) {
+        metadata.keywords = ifd0[piexifjs.ImageIFD.Software].replace('Keywords: ', '');
       }
     }
     
@@ -150,22 +151,30 @@ export async function updateImageMetadata(
           exifData.GPS[piexifjs.GPSIFD.GPSLongitudeRef] = coordinates.longitude >= 0 ? 'E' : 'W';
         }
         
-        // Set common metadata
+        // Set common metadata with proper type handling
         if (metadata) {
-          if (metadata.description) {
-            exifData['0th'][piexifjs.ImageIFD.ImageDescription] = metadata.description;
+          if (metadata.description && metadata.description.trim()) {
+            exifData['0th'][piexifjs.ImageIFD.ImageDescription] = metadata.description.trim();
           }
-          if (metadata.artist) {
-            exifData['0th'][piexifjs.ImageIFD.Artist] = metadata.artist;
+          if (metadata.artist && metadata.artist.trim()) {
+            exifData['0th'][piexifjs.ImageIFD.Artist] = metadata.artist.trim();
           }
-          if (metadata.copyright) {
-            exifData['0th'][piexifjs.ImageIFD.Copyright] = metadata.copyright;
+          if (metadata.copyright && metadata.copyright.trim()) {
+            exifData['0th'][piexifjs.ImageIFD.Copyright] = metadata.copyright.trim();
           }
-          if (metadata.title) {
-            exifData['0th'][piexifjs.ImageIFD.XPTitle] = metadata.title;
+          // Skip XP fields as they can cause encoding issues with piexifjs
+          // Use standard EXIF fields instead
+          if (metadata.title && metadata.title.trim()) {
+            // Use ImageDescription if no description is set, otherwise use DocumentName
+            if (!metadata.description) {
+              exifData['0th'][piexifjs.ImageIFD.ImageDescription] = metadata.title.trim();
+            } else {
+              exifData['0th'][piexifjs.ImageIFD.DocumentName] = metadata.title.trim();
+            }
           }
-          if (metadata.keywords) {
-            exifData['0th'][piexifjs.ImageIFD.XPKeywords] = metadata.keywords;
+          if (metadata.keywords && metadata.keywords.trim()) {
+            // Use Software field for keywords as it's more compatible
+            exifData['0th'][piexifjs.ImageIFD.Software] = `Keywords: ${metadata.keywords.trim()}`;
           }
         }
 

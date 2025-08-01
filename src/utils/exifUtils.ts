@@ -1,0 +1,151 @@
+import piexifjs from 'piexifjs';
+
+export interface GPSCoordinates {
+  latitude: number;
+  longitude: number;
+  latitudeRef: 'N' | 'S';
+  longitudeRef: 'E' | 'W';
+}
+
+export interface ImageWithMetadata {
+  file: File;
+  id: string;
+  preview: string;
+  gpsData?: GPSCoordinates;
+  hasGpsData: boolean;
+}
+
+// Convert decimal degrees to DMS (Degrees, Minutes, Seconds) format for EXIF
+export function decimalToDMS(decimal: number): [number, number, number] {
+  const degrees = Math.floor(Math.abs(decimal));
+  const minutes = Math.floor((Math.abs(decimal) - degrees) * 60);
+  const seconds = ((Math.abs(decimal) - degrees) * 60 - minutes) * 60;
+  return [degrees, minutes, seconds];
+}
+
+// Convert DMS format to decimal degrees
+export function dmsToDecimal(dms: [number, number, number], ref: string): number {
+  const decimal = dms[0] + dms[1] / 60 + dms[2] / 3600;
+  return ref === 'S' || ref === 'W' ? -decimal : decimal;
+}
+
+// Extract GPS data from EXIF
+export function extractGPSFromExif(exifData: any): GPSCoordinates | null {
+  try {
+    const gps = exifData?.GPS;
+    if (!gps || !gps[piexifjs.GPSIFD.GPSLatitude] || !gps[piexifjs.GPSIFD.GPSLongitude]) {
+      return null;
+    }
+
+    const latDMS = gps[piexifjs.GPSIFD.GPSLatitude];
+    const lonDMS = gps[piexifjs.GPSIFD.GPSLongitude];
+    const latRef = gps[piexifjs.GPSIFD.GPSLatitudeRef];
+    const lonRef = gps[piexifjs.GPSIFD.GPSLongitudeRef];
+
+    const latitude = dmsToDecimal(latDMS, latRef);
+    const longitude = dmsToDecimal(lonDMS, lonRef);
+
+    return {
+      latitude,
+      longitude,
+      latitudeRef: latRef as 'N' | 'S',
+      longitudeRef: lonRef as 'E' | 'W'
+    };
+  } catch (error) {
+    console.error('Error extracting GPS data:', error);
+    return null;
+  }
+}
+
+// Read EXIF data from image file
+export async function readExifData(file: File): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const binary = e.target?.result as string;
+        const exifData = piexifjs.load(binary);
+        resolve(exifData);
+      } catch (error) {
+        console.error('Error reading EXIF data:', error);
+        resolve(null);
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Update GPS data in EXIF and return new image blob
+export async function updateImageGPS(file: File, coordinates: GPSCoordinates): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const binary = e.target?.result as string;
+        let exifData = piexifjs.load(binary);
+
+        // Ensure GPS IFD exists
+        if (!exifData.GPS) {
+          exifData.GPS = {};
+        }
+
+        // Convert decimal to DMS format
+        const latDMS = decimalToDMS(coordinates.latitude);
+        const lonDMS = decimalToDMS(coordinates.longitude);
+
+        // Set GPS data
+        exifData.GPS[piexifjs.GPSIFD.GPSLatitude] = latDMS;
+        exifData.GPS[piexifjs.GPSIFD.GPSLongitude] = lonDMS;
+        exifData.GPS[piexifjs.GPSIFD.GPSLatitudeRef] = coordinates.latitude >= 0 ? 'N' : 'S';
+        exifData.GPS[piexifjs.GPSIFD.GPSLongitudeRef] = coordinates.longitude >= 0 ? 'E' : 'W';
+
+        // Create new binary with updated EXIF
+        const newBinary = piexifjs.insert(piexifjs.dump(exifData), binary);
+        
+        // Convert back to blob
+        const byteCharacters = atob(newBinary.split(',')[1]);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: file.type });
+        
+        resolve(blob);
+      } catch (error) {
+        console.error('Error updating GPS data:', error);
+        reject(error);
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Process uploaded image files
+export async function processImageFile(file: File): Promise<ImageWithMetadata> {
+  const id = Math.random().toString(36).substr(2, 9);
+  const preview = URL.createObjectURL(file);
+  
+  try {
+    const exifData = await readExifData(file);
+    const gpsData = extractGPSFromExif(exifData);
+    
+    return {
+      file,
+      id,
+      preview,
+      gpsData: gpsData || undefined,
+      hasGpsData: !!gpsData
+    };
+  } catch (error) {
+    console.error('Error processing image:', error);
+    return {
+      file,
+      id,
+      preview,
+      hasGpsData: false
+    };
+  }
+}

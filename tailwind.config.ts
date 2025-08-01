@@ -26,7 +26,8 @@ export default {
 				foreground: 'hsl(var(--foreground))',
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					foreground: 'hsl(var(--primary-foreground))',
+					glow: 'hsl(var(--primary-glow))'
 				},
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
@@ -52,6 +53,15 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				// GeoTagger custom colors
+				map: {
+					primary: 'hsl(var(--map-primary))',
+					secondary: 'hsl(var(--map-secondary))'
+				},
+				photo: {
+					accent: 'hsl(var(--photo-accent))'
+				},
+				coordinates: 'hsl(var(--coordinates))',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
@@ -67,6 +77,16 @@ export default {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			backgroundImage: {
+				'gradient-map': 'var(--gradient-map)',
+				'gradient-photo': 'var(--gradient-photo)',
+				'gradient-hero': 'var(--gradient-hero)'
+			},
+			boxShadow: {
+				'map': 'var(--shadow-map)',
+				'photo': 'var(--shadow-photo)',
+				'elevation': 'var(--shadow-elevation)'
 			},
 			keyframes: {
 				'accordion-down': {

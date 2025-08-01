@@ -1,40 +1,59 @@
+@import 'leaflet/dist/leaflet.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* GeoTagger Design System - Map & Photo Focused Colors */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 220 15% 97%;
+    --foreground: 210 15% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 210 15% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 210 15% 12%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Map green theme - inspired by terrain maps */
+    --primary: 140 45% 35%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 140 60% 55%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Warm earth tones for photos */
+    --secondary: 25 85% 88%;
+    --secondary-foreground: 140 45% 35%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 15% 95%;
+    --muted-foreground: 210 12% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Photo accent - camera lens blue */
+    --accent: 200 85% 60%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 13% 87%;
+    --input: 220 13% 91%;
+    --ring: 140 45% 35%;
+
+    /* Custom GeoTagger tokens */
+    --map-primary: 140 45% 35%;
+    --map-secondary: 90 40% 45%;
+    --photo-accent: 25 85% 65%;
+    --coordinates: 200 85% 35%;
+    
+    /* Gradients */
+    --gradient-map: linear-gradient(135deg, hsl(140 60% 55%), hsl(90 50% 45%));
+    --gradient-photo: linear-gradient(135deg, hsl(25 85% 75%), hsl(45 85% 85%));
+    --gradient-hero: linear-gradient(135deg, hsl(140 45% 35%), hsl(200 85% 60%));
+    
+    /* Shadows */
+    --shadow-map: 0 4px 20px hsl(140 45% 35% / 0.15);
+    --shadow-photo: 0 8px 30px hsl(25 85% 65% / 0.2);
+    --shadow-elevation: 0 10px 40px hsl(210 15% 12% / 0.1);
 
     --radius: 0.5rem;
 
@@ -56,33 +75,50 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 210 25% 8%;
+    --foreground: 220 15% 92%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 210 25% 10%;
+    --card-foreground: 220 15% 92%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 210 25% 10%;
+    --popover-foreground: 220 15% 92%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 140 60% 55%;
+    --primary-foreground: 210 25% 8%;
+    --primary-glow: 140 70% 65%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 25 60% 25%;
+    --secondary-foreground: 220 15% 92%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 210 20% 15%;
+    --muted-foreground: 210 15% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 200 85% 55%;
+    --accent-foreground: 210 25% 8%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 220 15% 92%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 210 20% 18%;
+    --input: 210 20% 15%;
+    --ring: 140 60% 55%;
+
+    /* Dark theme custom tokens */
+    --map-primary: 140 60% 55%;
+    --map-secondary: 90 50% 55%;
+    --photo-accent: 25 70% 45%;
+    --coordinates: 200 85% 55%;
+    
+    /* Dark gradients */
+    --gradient-map: linear-gradient(135deg, hsl(140 60% 45%), hsl(90 50% 35%));
+    --gradient-photo: linear-gradient(135deg, hsl(25 70% 35%), hsl(45 70% 45%));
+    --gradient-hero: linear-gradient(135deg, hsl(140 60% 25%), hsl(200 85% 35%));
+    
+    /* Dark shadows */
+    --shadow-map: 0 4px 20px hsl(140 60% 55% / 0.25);
+    --shadow-photo: 0 8px 30px hsl(25 70% 45% / 0.3);
+    --shadow-elevation: 0 10px 40px hsl(0 0% 0% / 0.4);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

@@ -45,6 +45,14 @@
     --photo-accent: 25 85% 65%;
     --coordinates: 200 85% 35%;
     
+    /* Metadata Editor Colors */
+    --metadata-primary: 200 40% 40%;
+    --metadata-secondary: 200 30% 70%;
+    
+    /* Bulk Actions Colors */
+    --bulk-primary: 140 30% 50%;
+    --bulk-secondary: 140 20% 70%;
+    
     /* Gradients */
     --gradient-map: linear-gradient(135deg, hsl(140 60% 55%), hsl(90 50% 45%));
     --gradient-photo: linear-gradient(135deg, hsl(25 85% 75%), hsl(45 85% 85%));
@@ -109,6 +117,14 @@
     --map-secondary: 90 50% 55%;
     --photo-accent: 25 70% 45%;
     --coordinates: 200 85% 55%;
+    
+    /* Metadata Editor Colors - Dark */
+    --metadata-primary: 200 50% 60%;
+    --metadata-secondary: 200 40% 50%;
+    
+    /* Bulk Actions Colors - Dark */
+    --bulk-primary: 140 40% 60%;
+    --bulk-secondary: 140 30% 50%;
     
     /* Dark gradients */
     --gradient-map: linear-gradient(135deg, hsl(140 60% 45%), hsl(90 50% 35%));

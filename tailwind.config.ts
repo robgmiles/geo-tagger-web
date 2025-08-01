@@ -62,6 +62,10 @@ export default {
 					accent: 'hsl(var(--photo-accent))'
 				},
 				coordinates: 'hsl(var(--coordinates))',
+				"metadata-primary": "hsl(var(--metadata-primary))",
+				"metadata-secondary": "hsl(var(--metadata-secondary))",
+				"bulk-primary": "hsl(var(--bulk-primary))",
+				"bulk-secondary": "hsl(var(--bulk-secondary))",
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',

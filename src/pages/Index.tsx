@@ -3,6 +3,8 @@ import { Header } from '@/components/Header';
 import { ImageUpload } from '@/components/ImageUpload';
 import { ImagePreview } from '@/components/ImagePreview';
 import { MapEditor } from '@/components/MapEditor';
+import { MetadataEditor } from '@/components/MetadataEditor';
+import { BulkActions } from '@/components/BulkActions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
@@ -10,8 +12,9 @@ import { Download, Trash2 } from 'lucide-react';
 import { 
   ImageWithMetadata, 
   GPSCoordinates, 
+  CommonMetadata,
   processImageFile, 
-  updateImageGPS 
+  updateImageMetadata 
 } from '@/utils/exifUtils';
 
 const Index = () => {
@@ -59,6 +62,33 @@ const Index = () => {
     });
   }, [toast]);
 
+  const handleBulkLocationUpdate = useCallback((coordinates: GPSCoordinates) => {
+    setImages(prev => prev.map(img => 
+      !img.hasGpsData 
+        ? { ...img, gpsData: coordinates, hasGpsData: true }
+        : img
+    ));
+    
+    const updatedCount = images.filter(img => !img.hasGpsData).length;
+    toast({
+      title: "Bulk Location Applied",
+      description: `Location applied to ${updatedCount} image${updatedCount !== 1 ? 's' : ''}`,
+    });
+  }, [images, toast]);
+
+  const handleMetadataUpdate = useCallback((imageId: string, metadata: CommonMetadata) => {
+    setImages(prev => prev.map(img => 
+      img.id === imageId 
+        ? { ...img, metadata }
+        : img
+    ));
+    
+    toast({
+      title: "Metadata Updated",
+      description: `Metadata saved for the image`,
+    });
+  }, [toast]);
+
   const handleImageRemove = useCallback((imageId: string) => {
     setImages(prev => prev.filter(img => img.id !== imageId));
     
@@ -75,9 +105,9 @@ const Index = () => {
     try {
       let blob: Blob;
       
-      if (image.gpsData) {
-        // Update EXIF with GPS data
-        blob = await updateImageGPS(image.file, image.gpsData);
+      if (image.gpsData || image.metadata) {
+        // Update EXIF with GPS and/or metadata
+        blob = await updateImageMetadata(image.file, image.gpsData, image.metadata);
       } else {
         // Download original file
         blob = image.file;
@@ -116,7 +146,7 @@ const Index = () => {
       <Header />
       
       <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Panel - Image Management */}
           <div className="space-y-6">
             <Card>
@@ -162,13 +192,29 @@ const Index = () => {
                 </CardContent>
               </Card>
             )}
+
+            {images.length > 1 && (
+              <BulkActions
+                images={images}
+                selectedImage={selectedImage}
+                onBulkLocationUpdate={handleBulkLocationUpdate}
+              />
+            )}
           </div>
 
-          {/* Right Panel - Map Editor */}
+          {/* Middle Panel - Map Editor */}
           <div className="lg:sticky lg:top-8 lg:self-start">
             <MapEditor
               selectedImage={selectedImage}
               onLocationUpdate={handleLocationUpdate}
+            />
+          </div>
+
+          {/* Right Panel - Metadata Editor */}
+          <div className="lg:sticky lg:top-8 lg:self-start">
+            <MetadataEditor
+              selectedImage={selectedImage}
+              onMetadataUpdate={handleMetadataUpdate}
             />
           </div>
         </div>

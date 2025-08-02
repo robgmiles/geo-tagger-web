@@ -38,6 +38,30 @@ export function dmsToDecimal(dms: [number, number, number], ref: string): number
   return ref === 'S' || ref === 'W' ? -decimal : decimal;
 }
 
+// Convert string to UTF-16 byte array for XP fields
+function stringToUTF16Bytes(str: string): number[] {
+  const bytes: number[] = [];
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    bytes.push(code & 0xff);
+    bytes.push((code >> 8) & 0xff);
+  }
+  // Add null terminator
+  bytes.push(0, 0);
+  return bytes;
+}
+
+// Convert UTF-16 byte array to string for XP fields
+function utf16BytesToString(bytes: number[]): string {
+  let str = '';
+  for (let i = 0; i < bytes.length - 1; i += 2) {
+    const code = bytes[i] | (bytes[i + 1] << 8);
+    if (code === 0) break; // null terminator
+    str += String.fromCharCode(code);
+  }
+  return str;
+}
+
 // Extract common metadata from EXIF
 export function extractCommonMetadata(exifData: any): CommonMetadata {
   try {
@@ -45,20 +69,33 @@ export function extractCommonMetadata(exifData: any): CommonMetadata {
     
     if (exifData?.['0th']) {
       const ifd0 = exifData['0th'];
-      if (ifd0[piexifjs.ImageIFD.ImageDescription]) {
+      
+      // Try XP fields first (Windows-compatible), then fall back to standard fields
+      if (ifd0[piexifjs.ImageIFD.XPTitle]) {
+        metadata.title = utf16BytesToString(ifd0[piexifjs.ImageIFD.XPTitle]);
+      } else if (ifd0[piexifjs.ImageIFD.DocumentName]) {
+        metadata.title = ifd0[piexifjs.ImageIFD.DocumentName];
+      }
+      
+      if (ifd0[piexifjs.ImageIFD.XPSubject]) {
+        metadata.description = utf16BytesToString(ifd0[piexifjs.ImageIFD.XPSubject]);
+      } else if (ifd0[piexifjs.ImageIFD.ImageDescription]) {
         metadata.description = ifd0[piexifjs.ImageIFD.ImageDescription];
       }
-      if (ifd0[piexifjs.ImageIFD.Artist]) {
+      
+      if (ifd0[piexifjs.ImageIFD.XPAuthor]) {
+        metadata.artist = utf16BytesToString(ifd0[piexifjs.ImageIFD.XPAuthor]);
+      } else if (ifd0[piexifjs.ImageIFD.Artist]) {
         metadata.artist = ifd0[piexifjs.ImageIFD.Artist];
       }
+      
       if (ifd0[piexifjs.ImageIFD.Copyright]) {
         metadata.copyright = ifd0[piexifjs.ImageIFD.Copyright];
       }
-      if (ifd0[piexifjs.ImageIFD.DocumentName]) {
-        metadata.title = ifd0[piexifjs.ImageIFD.DocumentName];
-      }
-      // Extract keywords from Software field if it contains our prefix
-      if (ifd0[piexifjs.ImageIFD.Software] && ifd0[piexifjs.ImageIFD.Software].startsWith('Keywords: ')) {
+      
+      if (ifd0[piexifjs.ImageIFD.XPKeywords]) {
+        metadata.keywords = utf16BytesToString(ifd0[piexifjs.ImageIFD.XPKeywords]);
+      } else if (ifd0[piexifjs.ImageIFD.Software] && ifd0[piexifjs.ImageIFD.Software].startsWith('Keywords: ')) {
         metadata.keywords = ifd0[piexifjs.ImageIFD.Software].replace('Keywords: ', '');
       }
     }
@@ -151,30 +188,36 @@ export async function updateImageMetadata(
           exifData.GPS[piexifjs.GPSIFD.GPSLongitudeRef] = coordinates.longitude >= 0 ? 'E' : 'W';
         }
         
-        // Set common metadata with proper type handling
+        // Set common metadata using Windows-compatible XP fields
         if (metadata) {
+          if (metadata.title && metadata.title.trim()) {
+            // Use XPTitle for Windows compatibility
+            exifData['0th'][piexifjs.ImageIFD.XPTitle] = stringToUTF16Bytes(metadata.title.trim());
+            // Also set DocumentName as fallback
+            exifData['0th'][piexifjs.ImageIFD.DocumentName] = metadata.title.trim();
+          }
+          
           if (metadata.description && metadata.description.trim()) {
+            // Use XPSubject for Windows "Subject" field
+            exifData['0th'][piexifjs.ImageIFD.XPSubject] = stringToUTF16Bytes(metadata.description.trim());
+            // Also set ImageDescription as fallback
             exifData['0th'][piexifjs.ImageIFD.ImageDescription] = metadata.description.trim();
           }
+          
           if (metadata.artist && metadata.artist.trim()) {
+            // Use XPAuthor for Windows "Authors" field
+            exifData['0th'][piexifjs.ImageIFD.XPAuthor] = stringToUTF16Bytes(metadata.artist.trim());
+            // Also set Artist as fallback
             exifData['0th'][piexifjs.ImageIFD.Artist] = metadata.artist.trim();
           }
+          
           if (metadata.copyright && metadata.copyright.trim()) {
             exifData['0th'][piexifjs.ImageIFD.Copyright] = metadata.copyright.trim();
           }
-          // Skip XP fields as they can cause encoding issues with piexifjs
-          // Use standard EXIF fields instead
-          if (metadata.title && metadata.title.trim()) {
-            // Use ImageDescription if no description is set, otherwise use DocumentName
-            if (!metadata.description) {
-              exifData['0th'][piexifjs.ImageIFD.ImageDescription] = metadata.title.trim();
-            } else {
-              exifData['0th'][piexifjs.ImageIFD.DocumentName] = metadata.title.trim();
-            }
-          }
+          
           if (metadata.keywords && metadata.keywords.trim()) {
-            // Use Software field for keywords as it's more compatible
-            exifData['0th'][piexifjs.ImageIFD.Software] = `Keywords: ${metadata.keywords.trim()}`;
+            // Use XPKeywords for Windows "Tags" field
+            exifData['0th'][piexifjs.ImageIFD.XPKeywords] = stringToUTF16Bytes(metadata.keywords.trim());
           }
         }
 

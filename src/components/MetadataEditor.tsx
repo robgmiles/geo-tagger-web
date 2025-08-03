@@ -88,28 +88,6 @@ export const MetadataEditor: React.FC<MetadataEditorProps> = ({
         <div className="space-y-4">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="title">Title</Label>
-              {metadata.title && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => clearField('title')}
-                  className="h-6 w-6 p-0"
-                >
-                  <X className="w-3 h-3" />
-                </Button>
-              )}
-            </div>
-            <Input
-              id="title"
-              value={metadata.title || ''}
-              onChange={(e) => handleFieldChange('title', e.target.value)}
-              placeholder="Image title"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
               <Label htmlFor="description">Subject</Label>
               {metadata.description && (
                 <Button

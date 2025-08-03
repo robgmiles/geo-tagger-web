@@ -241,7 +241,6 @@ const Index = () => {
                         onSelect={() => setSelectedImageId(image.id)}
                         onRemove={() => handleImageRemove(image.id)}
                         onDownload={() => handleDownloadImage(image.id)}
-                        onSetLocation={() => setSelectedImageId(image.id)}
                       />
                     ))}
                   </div>

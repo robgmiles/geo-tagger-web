@@ -190,16 +190,9 @@ export async function updateImageMetadata(
         
         // Set common metadata using Windows-compatible XP fields
         if (metadata) {
-          if (metadata.title && metadata.title.trim()) {
-            // Use XPTitle for Windows "Title" field
-            exifData['0th'][piexifjs.ImageIFD.XPTitle] = stringToUTF16Bytes(metadata.title.trim());
-          }
-          
           if (metadata.description && metadata.description.trim()) {
             // Use XPSubject for Windows "Subject" field
             exifData['0th'][piexifjs.ImageIFD.XPSubject] = stringToUTF16Bytes(metadata.description.trim());
-            // Also set ImageDescription as fallback
-            exifData['0th'][piexifjs.ImageIFD.ImageDescription] = metadata.description.trim();
           }
           
           if (metadata.artist && metadata.artist.trim()) {

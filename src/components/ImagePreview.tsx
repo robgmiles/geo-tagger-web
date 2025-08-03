@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Download, Trash2, Navigation } from 'lucide-react';
+import { MapPin, Download, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,7 +12,6 @@ interface ImagePreviewProps {
   onSelect: () => void;
   onRemove: () => void;
   onDownload: () => void;
-  onSetLocation: () => void;
 }
 
 export const ImagePreview: React.FC<ImagePreviewProps> = ({
@@ -20,8 +19,7 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
   isSelected,
   onSelect,
   onRemove,
-  onDownload,
-  onSetLocation
+  onDownload
 }) => {
   return (
     <Card 
@@ -78,22 +76,6 @@ export const ImagePreview: React.FC<ImagePreviewProps> = ({
               }}
             >
               <Download className="w-4 h-4" />
-            </Button>
-          </div>
-
-          {/* Set Location Button */}
-          <div className="absolute bottom-2 inset-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full bg-background/90 backdrop-blur-sm border-primary/20 hover:bg-primary hover:text-primary-foreground"
-              onClick={(e) => {
-                e.stopPropagation();
-                onSetLocation();
-              }}
-            >
-              <Navigation className="w-4 h-4 mr-2" />
-              Set Location
             </Button>
           </div>
         </div>

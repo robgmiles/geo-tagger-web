@@ -75,6 +75,12 @@ export function extractCommonMetadata(exifData: any): CommonMetadata {
         metadata.title = utf16BytesToString(ifd0[piexifjs.ImageIFD.XPTitle]);
       } else if (ifd0[piexifjs.ImageIFD.DocumentName]) {
         metadata.title = ifd0[piexifjs.ImageIFD.DocumentName];
+      } else if (ifd0[piexifjs.ImageIFD.ImageDescription]) {
+        // Only use ImageDescription as title if no XPTitle or DocumentName
+        const desc = ifd0[piexifjs.ImageIFD.ImageDescription];
+        if (desc && !ifd0[piexifjs.ImageIFD.XPSubject]) {
+          metadata.title = desc;
+        }
       }
       
       if (ifd0[piexifjs.ImageIFD.XPSubject]) {
@@ -193,6 +199,8 @@ export async function updateImageMetadata(
           if (metadata.title && metadata.title.trim()) {
             // Use XPTitle for Windows "Title" field
             exifData['0th'][piexifjs.ImageIFD.XPTitle] = stringToUTF16Bytes(metadata.title.trim());
+            // Also set DocumentName as fallback for better compatibility
+            exifData['0th'][piexifjs.ImageIFD.DocumentName] = metadata.title.trim();
           }
           
           if (metadata.description && metadata.description.trim()) {

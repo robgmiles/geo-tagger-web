@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Download, Trash2 } from 'lucide-react';
+import JSZip from 'jszip';
 import { 
   ImageWithMetadata, 
   GPSCoordinates, 
@@ -137,8 +138,54 @@ const Index = () => {
   }, [images, toast]);
 
   const handleClearAll = () => {
+    images.forEach(image => URL.revokeObjectURL(image.preview));
     setImages([]);
     setSelectedImageId(null);
+  };
+
+  const handleDownloadAll = async () => {
+    if (images.length === 0) return;
+
+    const zip = new JSZip();
+    
+    try {
+      for (const image of images) {
+        let blob: Blob;
+        
+        // Check if image has any updates (GPS or metadata)
+        if (image.gpsData || image.metadata) {
+          blob = await updateImageMetadata(image.file, image.gpsData, image.metadata);
+        } else {
+          blob = image.file;
+        }
+        
+        // Add to zip with original filename
+        zip.file(image.file.name, blob);
+      }
+      
+      // Generate zip and download
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'images-with-metadata.zip';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Download Complete",
+        description: `Downloaded ${images.length} images as ZIP file`,
+      });
+    } catch (error) {
+      console.error('Error creating zip:', error);
+      toast({
+        title: "Download Failed",
+        description: "There was an error creating the ZIP file",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -166,14 +213,23 @@ const Index = () => {
                     <h3 className="text-lg font-semibold">
                       Images ({images.length}/5)
                     </h3>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={handleClearAll}
-                    >
-                      <Trash2 className="w-4 h-4 mr-2" />
-                      Clear All
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={handleDownloadAll}
+                        size="sm"
+                      >
+                        <Download className="w-4 h-4 mr-2" />
+                        Download All
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={handleClearAll}
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Clear All
+                      </Button>
+                    </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">

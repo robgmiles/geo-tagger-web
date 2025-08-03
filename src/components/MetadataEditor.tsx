@@ -110,7 +110,7 @@ export const MetadataEditor: React.FC<MetadataEditorProps> = ({
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">Subject</Label>
               {metadata.description && (
                 <Button
                   variant="ghost"
@@ -126,7 +126,7 @@ export const MetadataEditor: React.FC<MetadataEditorProps> = ({
               id="description"
               value={metadata.description || ''}
               onChange={(e) => handleFieldChange('description', e.target.value)}
-              placeholder="Image description"
+              placeholder="Image subject"
               rows={3}
             />
           </div>

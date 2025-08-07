@@ -3,7 +3,8 @@ import L from 'leaflet';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Save, RotateCcw } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { MapPin, Save, RotateCcw, Search } from 'lucide-react';
 import { ImageWithMetadata, GPSCoordinates } from '@/utils/exifUtils';
 
 // Fix for Leaflet default markers in webpack
@@ -30,6 +31,8 @@ export const MapEditor: React.FC<MapEditorProps> = ({
   const markerRef = useRef<L.Marker | null>(null);
   const [currentCoords, setCurrentCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
   useEffect(() => {
     if (!mapRef.current) {
@@ -122,6 +125,44 @@ export const MapEditor: React.FC<MapEditorProps> = ({
     }
   };
 
+  const handleSearch = async () => {
+    if (!searchQuery.trim() || !mapRef.current) return;
+
+    setIsSearching(true);
+    
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery.trim())}&limit=1`
+      );
+      
+      const results = await response.json();
+      
+      if (results && results.length > 0) {
+        const result = results[0];
+        const lat = parseFloat(result.lat);
+        const lng = parseFloat(result.lon);
+        
+        // Update map view to the found location
+        mapRef.current.setView([lat, lng], 13);
+        
+        // Clear search input
+        setSearchQuery('');
+      } else {
+        console.warn('No results found for:', searchQuery);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <Card className="h-full">
       <CardHeader className="pb-4">
@@ -145,6 +186,25 @@ export const MapEditor: React.FC<MapEditorProps> = ({
             }
           </div>
         )}
+        
+        {/* Search Bar */}
+        <div className="flex gap-2 mt-4">
+          <Input
+            placeholder="Search for a location..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={handleSearchKeyPress}
+            className="flex-1"
+          />
+          <Button 
+            onClick={handleSearch}
+            disabled={!searchQuery.trim() || isSearching}
+            size="sm"
+            variant="outline"
+          >
+            <Search className="w-4 h-4" />
+          </Button>
+        </div>
       </CardHeader>
 
       <CardContent className="p-0">

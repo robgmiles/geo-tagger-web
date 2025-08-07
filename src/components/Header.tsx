@@ -1,21 +1,28 @@
 import React from 'react';
-import { Camera, MapPin, Shield } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Camera, MapPin, Shield, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 export const Header: React.FC = () => {
   return (
     <header className="bg-gradient-hero text-primary-foreground py-6 px-4 shadow-elevation">
       <div className="container mx-auto">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
-            <Camera className="w-6 h-6" />
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+              <Camera className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">GeoTagger</h1>
+              <p className="text-primary-foreground/80 text-sm">
+                Privacy-first EXIF GPS editor
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold">GeoTagger</h1>
-            <p className="text-primary-foreground/80 text-sm">
-              Privacy-first EXIF GPS editor
-            </p>
-          </div>
+          <Link to="/about" className="flex items-center gap-2 text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+            <Info className="w-4 h-4" />
+            <span className="hidden sm:inline">About</span>
+          </Link>
         </div>
         
         <div className="flex flex-wrap gap-2 text-xs">

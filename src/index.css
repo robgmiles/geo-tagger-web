@@ -3,65 +3,66 @@
 @tailwind components;
 @tailwind utilities;
 
-/* GeoTagger Design System - Map & Photo Focused Colors */
+/* Modern Minimalist Design System - Pale Blues & Dark Orange */
 
 @layer base {
   :root {
-    --background: 220 15% 97%;
-    --foreground: 210 15% 12%;
+    /* Light Theme - Pale Blues */
+    --background: 210 15% 98%;
+    --foreground: 215 20% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 210 15% 12%;
+    --card: 210 20% 99%;
+    --card-foreground: 215 20% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 15% 12%;
+    --popover: 210 20% 99%;
+    --popover-foreground: 215 20% 15%;
 
-    /* Map green theme - inspired by terrain maps */
-    --primary: 140 45% 35%;
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 140 60% 55%;
+    /* Primary - Soft Blue */
+    --primary: 210 40% 85%;
+    --primary-foreground: 215 30% 25%;
+    --primary-glow: 210 50% 75%;
 
-    /* Warm earth tones for photos */
-    --secondary: 25 85% 88%;
-    --secondary-foreground: 140 45% 35%;
+    /* Secondary - Very Light Blue */
+    --secondary: 210 25% 95%;
+    --secondary-foreground: 215 20% 35%;
 
-    --muted: 220 15% 95%;
-    --muted-foreground: 210 12% 45%;
+    --muted: 210 15% 94%;
+    --muted-foreground: 215 12% 50%;
 
-    /* Photo accent - camera lens blue */
-    --accent: 200 85% 60%;
+    /* Accent - Medium Blue */
+    --accent: 210 60% 70%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 75% 65%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 87%;
-    --input: 220 13% 91%;
-    --ring: 140 45% 35%;
+    --border: 210 20% 90%;
+    --input: 210 15% 95%;
+    --ring: 210 60% 70%;
 
-    /* Custom GeoTagger tokens */
-    --map-primary: 140 45% 35%;
-    --map-secondary: 90 40% 45%;
-    --photo-accent: 25 85% 65%;
-    --coordinates: 200 85% 35%;
+    /* Custom tokens */
+    --map-primary: 210 50% 75%;
+    --map-secondary: 210 30% 85%;
+    --photo-accent: 210 60% 70%;
+    --coordinates: 210 70% 60%;
     
     /* Metadata Editor Colors */
-    --metadata-primary: 200 40% 40%;
-    --metadata-secondary: 200 30% 70%;
+    --metadata-primary: 210 50% 70%;
+    --metadata-secondary: 210 30% 85%;
     
     /* Bulk Actions Colors */
-    --bulk-primary: 140 30% 50%;
-    --bulk-secondary: 140 20% 70%;
+    --bulk-primary: 210 45% 75%;
+    --bulk-secondary: 210 25% 88%;
     
     /* Gradients */
-    --gradient-map: linear-gradient(135deg, hsl(140 60% 55%), hsl(90 50% 45%));
-    --gradient-photo: linear-gradient(135deg, hsl(25 85% 75%), hsl(45 85% 85%));
-    --gradient-hero: linear-gradient(135deg, hsl(140 45% 35%), hsl(200 85% 60%));
+    --gradient-map: linear-gradient(135deg, hsl(210 50% 80%), hsl(210 40% 85%));
+    --gradient-photo: linear-gradient(135deg, hsl(210 30% 92%), hsl(210 20% 96%));
+    --gradient-hero: linear-gradient(135deg, hsl(210 60% 70%), hsl(210 50% 80%));
     
     /* Shadows */
-    --shadow-map: 0 4px 20px hsl(140 45% 35% / 0.15);
-    --shadow-photo: 0 8px 30px hsl(25 85% 65% / 0.2);
-    --shadow-elevation: 0 10px 40px hsl(210 15% 12% / 0.1);
+    --shadow-map: 0 4px 20px hsl(210 40% 70% / 0.15);
+    --shadow-photo: 0 8px 30px hsl(210 30% 80% / 0.2);
+    --shadow-elevation: 0 10px 40px hsl(215 20% 15% / 0.08);
 
     --radius: 0.5rem;
 
@@ -83,58 +84,62 @@
   }
 
   .dark {
-    --background: 210 25% 8%;
-    --foreground: 220 15% 92%;
+    /* Dark Theme - Blacks & Dark Orange */
+    --background: 0 0% 6%;
+    --foreground: 20 15% 92%;
 
-    --card: 210 25% 10%;
-    --card-foreground: 220 15% 92%;
+    --card: 0 0% 8%;
+    --card-foreground: 20 15% 92%;
 
-    --popover: 210 25% 10%;
-    --popover-foreground: 220 15% 92%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 20 15% 92%;
 
-    --primary: 140 60% 55%;
-    --primary-foreground: 210 25% 8%;
-    --primary-glow: 140 70% 65%;
+    /* Primary - Dark Orange */
+    --primary: 20 85% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 20 90% 55%;
 
-    --secondary: 25 60% 25%;
-    --secondary-foreground: 220 15% 92%;
+    /* Secondary - Dark Gray */
+    --secondary: 0 0% 15%;
+    --secondary-foreground: 20 15% 85%;
 
-    --muted: 210 20% 15%;
-    --muted-foreground: 210 15% 65%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 20 10% 60%;
 
-    --accent: 200 85% 55%;
-    --accent-foreground: 210 25% 8%;
+    /* Accent - Bright Orange */
+    --accent: 20 100% 60%;
+    --accent-foreground: 0 0% 8%;
 
-    --destructive: 0 75% 55%;
-    --destructive-foreground: 220 15% 92%;
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 210 20% 18%;
-    --input: 210 20% 15%;
-    --ring: 140 60% 55%;
+    --border: 0 0% 18%;
+    --input: 0 0% 12%;
+    --ring: 20 85% 45%;
 
     /* Dark theme custom tokens */
-    --map-primary: 140 60% 55%;
-    --map-secondary: 90 50% 55%;
-    --photo-accent: 25 70% 45%;
-    --coordinates: 200 85% 55%;
+    --map-primary: 20 80% 50%;
+    --map-secondary: 20 60% 35%;
+    --photo-accent: 20 90% 55%;
+    --coordinates: 20 85% 45%;
     
     /* Metadata Editor Colors - Dark */
-    --metadata-primary: 200 50% 60%;
-    --metadata-secondary: 200 40% 50%;
+    --metadata-primary: 20 75% 50%;
+    --metadata-secondary: 20 50% 35%;
     
     /* Bulk Actions Colors - Dark */
-    --bulk-primary: 140 40% 60%;
-    --bulk-secondary: 140 30% 50%;
+    --bulk-primary: 20 70% 45%;
+    --bulk-secondary: 20 45% 30%;
     
     /* Dark gradients */
-    --gradient-map: linear-gradient(135deg, hsl(140 60% 45%), hsl(90 50% 35%));
-    --gradient-photo: linear-gradient(135deg, hsl(25 70% 35%), hsl(45 70% 45%));
-    --gradient-hero: linear-gradient(135deg, hsl(140 60% 25%), hsl(200 85% 35%));
+    --gradient-map: linear-gradient(135deg, hsl(20 80% 40%), hsl(20 60% 25%));
+    --gradient-photo: linear-gradient(135deg, hsl(20 70% 30%), hsl(20 50% 20%));
+    --gradient-hero: linear-gradient(135deg, hsl(20 85% 35%), hsl(20 75% 45%));
     
     /* Dark shadows */
-    --shadow-map: 0 4px 20px hsl(140 60% 55% / 0.25);
-    --shadow-photo: 0 8px 30px hsl(25 70% 45% / 0.3);
-    --shadow-elevation: 0 10px 40px hsl(0 0% 0% / 0.4);
+    --shadow-map: 0 4px 20px hsl(20 80% 35% / 0.4);
+    --shadow-photo: 0 8px 30px hsl(20 70% 40% / 0.3);
+    --shadow-elevation: 0 10px 40px hsl(0 0% 0% / 0.6);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Camera, MapPin, Shield, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export const Header: React.FC = () => {
   return (
@@ -19,10 +20,13 @@ export const Header: React.FC = () => {
               </p>
             </div>
           </div>
-          <Link to="/about" className="flex items-center gap-2 text-primary-foreground/80 hover:text-primary-foreground transition-colors">
-            <Info className="w-4 h-4" />
-            <span className="hidden sm:inline">About</span>
-          </Link>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Link to="/about" className="flex items-center gap-2 text-primary-foreground/80 hover:text-primary-foreground transition-colors">
+              <Info className="w-4 h-4" />
+              <span className="hidden sm:inline">About</span>
+            </Link>
+          </div>
         </div>
         
         <div className="flex flex-wrap gap-2 text-xs">

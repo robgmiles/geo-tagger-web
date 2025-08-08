@@ -24,18 +24,56 @@ export interface ImageWithMetadata {
   metadata?: CommonMetadata;
 }
 
-// Convert decimal degrees to DMS (Degrees, Minutes, Seconds) format for EXIF
-export function decimalToDMS(decimal: number): [number, number, number] {
-  const degrees = Math.floor(Math.abs(decimal));
-  const minutes = Math.floor((Math.abs(decimal) - degrees) * 60);
-  const seconds = ((Math.abs(decimal) - degrees) * 60 - minutes) * 60;
-  return [degrees, minutes, seconds];
+// Convert decimal degrees to DMS rational format for EXIF (piexifjs expects rational numbers)
+export function decimalToDMS(decimal: number): [[number, number], [number, number], [number, number]] {
+  // Validate coordinate range
+  if (Math.abs(decimal) > 180) {
+    throw new Error(`Invalid coordinate: ${decimal}. Must be between -180 and 180.`);
+  }
+  
+  const absDecimal = Math.abs(decimal);
+  const degrees = Math.floor(absDecimal);
+  const minutesFloat = (absDecimal - degrees) * 60;
+  const minutes = Math.floor(minutesFloat);
+  const secondsFloat = (minutesFloat - minutes) * 60;
+  
+  // Convert seconds to rational number to maintain precision
+  // Use denominator of 1000 to maintain 3 decimal places
+  const secondsNumerator = Math.round(secondsFloat * 1000);
+  const secondsDenominator = 1000;
+  
+  console.log(`Converting ${decimal}° to DMS: ${degrees}°${minutes}'${secondsFloat.toFixed(3)}"`);
+  
+  return [
+    [degrees, 1],
+    [minutes, 1], 
+    [secondsNumerator, secondsDenominator]
+  ];
 }
 
-// Convert DMS format to decimal degrees
-export function dmsToDecimal(dms: [number, number, number], ref: string): number {
-  const decimal = dms[0] + dms[1] / 60 + dms[2] / 3600;
-  return ref === 'S' || ref === 'W' ? -decimal : decimal;
+// Convert DMS format to decimal degrees (handles both rational and simple array formats)
+export function dmsToDecimal(dms: any, ref: string): number {
+  let degrees: number, minutes: number, seconds: number;
+  
+  // Handle rational format: [[deg_num, deg_den], [min_num, min_den], [sec_num, sec_den]]
+  if (Array.isArray(dms[0]) && dms[0].length === 2) {
+    degrees = dms[0][0] / dms[0][1];
+    minutes = dms[1][0] / dms[1][1];
+    seconds = dms[2][0] / dms[2][1];
+  } 
+  // Handle simple array format: [degrees, minutes, seconds]
+  else {
+    degrees = dms[0];
+    minutes = dms[1];
+    seconds = dms[2];
+  }
+  
+  const decimal = degrees + minutes / 60 + seconds / 3600;
+  const result = ref === 'S' || ref === 'W' ? -decimal : decimal;
+  
+  console.log(`Converting DMS [${degrees}, ${minutes}, ${seconds}] ${ref} to decimal: ${result}`);
+  
+  return result;
 }
 
 // Convert string to UTF-16 byte array for XP fields
@@ -173,19 +211,34 @@ export async function updateImageMetadata(
         }
         
         if (coordinates) {
+          // Validate coordinates
+          if (Math.abs(coordinates.latitude) > 90) {
+            throw new Error(`Invalid latitude: ${coordinates.latitude}. Must be between -90 and 90.`);
+          }
+          if (Math.abs(coordinates.longitude) > 180) {
+            throw new Error(`Invalid longitude: ${coordinates.longitude}. Must be between -180 and 180.`);
+          }
+          
           if (!exifData.GPS) {
             exifData.GPS = {};
           }
 
+          console.log(`Setting GPS coordinates: ${coordinates.latitude}, ${coordinates.longitude}`);
+          
           // Convert decimal to DMS format
           const latDMS = decimalToDMS(coordinates.latitude);
           const lonDMS = decimalToDMS(coordinates.longitude);
+          
+          const latRef = coordinates.latitude >= 0 ? 'N' : 'S';
+          const lonRef = coordinates.longitude >= 0 ? 'E' : 'W';
+
+          console.log(`GPS DMS values - Lat: ${JSON.stringify(latDMS)} ${latRef}, Lon: ${JSON.stringify(lonDMS)} ${lonRef}`);
 
           // Set GPS data
           exifData.GPS[piexifjs.GPSIFD.GPSLatitude] = latDMS;
           exifData.GPS[piexifjs.GPSIFD.GPSLongitude] = lonDMS;
-          exifData.GPS[piexifjs.GPSIFD.GPSLatitudeRef] = coordinates.latitude >= 0 ? 'N' : 'S';
-          exifData.GPS[piexifjs.GPSIFD.GPSLongitudeRef] = coordinates.longitude >= 0 ? 'E' : 'W';
+          exifData.GPS[piexifjs.GPSIFD.GPSLatitudeRef] = latRef;
+          exifData.GPS[piexifjs.GPSIFD.GPSLongitudeRef] = lonRef;
         }
         
         // Set common metadata using Windows-compatible XP fields

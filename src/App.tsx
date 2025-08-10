@@ -3,7 +3,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Index from "@/pages/Index";
 import About from "@/pages/About";
 import NotFound from "@/pages/NotFound";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/components/theme-provider.tsx"; // <-- The only change is here
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 const queryClient = new QueryClient();

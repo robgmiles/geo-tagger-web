@@ -3,12 +3,14 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Index from "@/pages/Index";
 import About from "@/pages/About";
 import NotFound from "@/pages/NotFound";
-import { ThemeProvider } from "./components/theme-provider.tsx"; // <-- The only change is here
+import { ThemeProvider } from "./components/theme-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
 const queryClient = new QueryClient();
 
-// This is where we add the basename for GitHub Pages
+// Conditional basename - only use it in production for GitHub Pages
+const basename = import.meta.env.PROD ? "/geo-tagger-web/" : "";
+
 const router = createBrowserRouter(
   [
     {
@@ -22,7 +24,7 @@ const router = createBrowserRouter(
     },
   ],
   {
-    basename: "/geo-tagger-web/",
+    basename: basename,
   }
 );
 

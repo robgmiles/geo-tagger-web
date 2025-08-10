@@ -1,13 +1,12 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
-import path from "path";
+// We no longer need 'path' since we are removing the alias
+// import path from "path"; 
 import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // Add this line to tell Vite the correct path for GitHub Pages
   base: "/geo-tagger-web/",
-
   server: {
     host: "::",
     port: 8080,
@@ -17,9 +16,5 @@ export default defineConfig(({ mode }) => ({
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
+  // The 'resolve' and 'alias' sections have been removed.
 }));
